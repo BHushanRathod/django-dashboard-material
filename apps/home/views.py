@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from apps.home.models import *
 
 
 @login_required(login_url="/login/")
@@ -16,6 +17,11 @@ def index(request):
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
+
+
+def get_resources():
+    goal_criteria = GoalCriteria.objects.all()
+    return goal_criteria
 
 
 @login_required(login_url="/login/")
@@ -29,7 +35,12 @@ def pages(request):
 
         if load_template == 'admin':
             return HttpResponseRedirect(reverse('admin:index'))
+
+        resources = get_resources()
         context['segment'] = load_template
+        context['resources'] = resources
+
+        print("context: ", context)
 
         html_template = loader.get_template('home/' + load_template)
         return HttpResponse(html_template.render(context, request))
